@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,9 +20,40 @@ class AgentSettings(BaseSettings):
     provider: str = Field("openai", description="Provider name used by the model adapter.")
 
 
-def load_settings(workspace: str | Path | None = None) -> AgentSettings:
-    """Load and validate agent settings with an optional workspace override."""
-    settings = AgentSettings()
+def load_settings(
+    workspace: str | Path | None = None,
+    api_key: str | None = None,
+    model: str | None = None,
+    base_url: str | None = None,
+    provider: str | None = None,
+) -> AgentSettings:
+    """Load and validate agent settings with optional overrides."""
+    kwargs = {}
     if workspace is not None:
-        settings.workspace = Path(workspace)
-    return settings
+        kwargs["workspace"] = Path(workspace)
+    if api_key is not None:
+        kwargs["api_key"] = api_key
+    if model is not None:
+        kwargs["model"] = model
+    if base_url is not None:
+        kwargs["base_url"] = base_url
+    if provider is not None:
+        kwargs["provider"] = provider
+
+    try:
+        return AgentSettings(**kwargs)
+    except ValidationError as exc:
+        # Check specifically if api_key is missing
+        missing_api_key = False
+        for error in exc.errors():
+            loc = error.get("loc", ())
+            if "api_key" in loc and error.get("type") in ("missing", "value_error.missing"):
+                missing_api_key = True
+                break
+
+        if missing_api_key:
+            raise ValueError(
+                "API key is missing. Please set the API_KEY environment variable or specify it via CLI/env."
+            ) from exc
+        raise ValueError(f"Configuration validation failed: {exc}") from exc
+
