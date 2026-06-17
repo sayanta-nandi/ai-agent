@@ -9,6 +9,7 @@ from agent_tui.tools.file_tools import (
     EditFileTool,
     DeleteFileTool,
 )
+from agent_tui.tools.command_tool import RunCommandTool
 
 __all__ = [
     "Tool",
@@ -20,4 +21,5 @@ __all__ = [
     "WriteFileTool",
     "EditFileTool",
     "DeleteFileTool",
+    "RunCommandTool",
 ]
