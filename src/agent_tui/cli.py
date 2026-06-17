@@ -16,6 +16,7 @@ def version() -> None:
 @app.command()
 def run(
     workspace: str = typer.Argument(None, help="Workspace directory for agent operations."),
+    workspace_option: str = typer.Option(None, "--workspace", help="Workspace directory override."),
     model: str = typer.Option(None, "--model", help="Model name override."),
     api_key: str = typer.Option(None, "--api-key", help="API key override."),
     base_url: str = typer.Option(None, "--base-url", help="API base URL override."),
@@ -37,9 +38,12 @@ def run(
     )
     from agent_tui.tui import AgentTuiApp
 
+    # --workspace option takes precedence over positional argument
+    effective_workspace = workspace_option if workspace_option is not None else workspace
+
     try:
         settings = load_settings(
-            workspace=workspace,
+            workspace=effective_workspace,
             api_key=api_key,
             model=model,
             base_url=base_url,
