@@ -6,6 +6,33 @@ Terminal AI coding agent scaffold.
 
 `agent-tui` is a Python-based terminal AI coding agent. It is being built around a safe workspace model, explicit tool calls, an async LLM adapter, and a minimal Textual interface.
 
+## Install and run locally
+
+`agent-tui` is packaged as a Python project and exposes the `agent-tui` console script.
+
+```bash
+# Install project dependencies and the package in the local environment
+uv sync
+
+# Create your local configuration from the template
+cp .env.example .env
+```
+
+Edit `.env` and set at least `API_KEY` and `MODEL`. The template uses the default OpenAI-compatible provider (`PROVIDER=openai`) and `BASE_URL=https://api.openai.com/v1`). Create or choose an existing workspace directory for the agent to operate in.
+
+Run the agent against a workspace directory:
+
+```bash
+uv run agent-tui run ./workspace
+```
+
+You can also install the console script globally with `pipx` if you want to run `agent-tui` outside this checkout:
+
+```bash
+pipx install .
+agent-tui run ./workspace
+```
+
 ## Current V1 scope
 
 The V1 target is:
